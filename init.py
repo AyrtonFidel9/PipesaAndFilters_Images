@@ -2,7 +2,11 @@ from warnings import filters
 import os
 from skimage import io
 from skimage.color import rgb2gray
-from filtros import Filtros
+from Filtro_Suavizar_Cont import FiltroSuavizar
+from Filtro_Deteccion_Bordes import FiltrosBordes
+from Filtro_Mejor_Contraste import FiltroMejContraste
+from Filtro_Eliminacion_Ruido import FiltroRuido
+from FiltroRestauracion import FiltroRestauracion
 from Tuberias import Tuberia
 
 def menu():
@@ -11,9 +15,10 @@ def menu():
     print ("\t1 - Mejoramiento de contraste")
     print ("\t2 - Eliminacion de ruido")
     print ("\t3 - Restauracion")
-    print ("\t4 - Suavizar")
+    print ("\t4 - Suavizar y resaltar contornos")
     print ("\t5 - Detección de bordes")
     print ("\t9 - salir")
+55
 
 def menu_bordes():
     os.system('clear') # NOTA para windows tienes que cambiar clear por cls
@@ -26,15 +31,17 @@ def menu_bordes():
 if __name__=='__main__': 
     ##se llama a los filtros y tuberias
     tuberia = Tuberia()
-    filtro = Filtros()
-
+    suavizar = FiltroSuavizar()
+    bordes = FiltrosBordes()
+    contraste = FiltroMejContraste()
+    ruido = FiltroRuido()
+    restauracion = FiltroRestauracion()
     ##lectura de la imagen
     imagen = io.imread("imagen.jpg")
     
     while True:
         # Mostramos el menu
         menu()
-    
         # solicituamos una opción al usuario
         opcionMenu = input("inserta un numero valor >> ")
     
@@ -42,9 +49,9 @@ if __name__=='__main__':
             print ("")
             input("Has pulsado la opción 1...\npulsa una tecla para continuar")
             ##Mejoramiento de contraste
-            tuberia.add([filtro.filtro_estiramiento_contraste,
-                         filtro.filtro_ecualizacion,
-                         filtro.filtro_ecua_adaptativa])
+            tuberia.add([contraste.filtro_estiramiento_contraste,
+                         contraste.filtro_ecualizacion,
+                         contraste.filtro_ecua_adaptativa])
             tuberia.ejecutar(imagen, 0)
         
         elif opcionMenu=="2":
@@ -53,38 +60,39 @@ if __name__=='__main__':
             ##Eliminación de ruido
             imagen = io.imread("charlie.jpg")
             img_gray = rgb2gray(imagen)
-            tuberia.add([filtro.filtro_eliminacion_ruido])
+            tuberia.add([ruido.filtro_eliminacion_ruido])
             tuberia.ejecutar(imagen, 0)
             
         elif opcionMenu=="3":
             print ("")
             input("Has pulsado la opción 3...\npulsa una tecla para continuar")
-            ##Restauracion
+            ##Restauracion5
             imagen = io.imread("imagen_ruido.jpg")
             img = rgb2gray(imagen)
-            tuberia.add([filtro.filtro_restauracion])
+            tuberia.add([restauracion.filtro_restauracion])
             tuberia.ejecutar(img,0)
             
         elif opcionMenu=="4": 
             ##suavizar 
             imagen = io.imread("mario.jpg")
             img = rgb2gray(imagen)
-            tuberia.add([filtro.filtro_suavizar_resalatar_contrastes])
+            tuberia.add([suavizar.filtro_suavizar_resalatar_contrastes])
             tuberia.ejecutar(img,0)
         
         elif opcionMenu=="5":
             ##detección de bordes
             menu_bordes()
+            imagen = io.imread("imagen.jpg")
             imagen_g = rgb2gray(imagen)
             opcionMenuBordes = input("inserta un numero valor >> ")
             if opcionMenuBordes == "1":
-                tuberia.add([filtro.filtro_sobel])
+                tuberia.add([bordes.filtro_sobel])
                 tuberia.ejecutar(imagen_g, 0)
             elif opcionMenuBordes == "2":
-                tuberia.add([filtro.filtro_roberts])
+                tuberia.add([bordes.filtro_roberts])
                 tuberia.ejecutar(imagen_g, 0)
             elif opcionMenuBordes == "3":
-                tuberia.add([filtro.filtro_prewitt])
+                tuberia.add([bordes.filtro_prewitt])
                 tuberia.ejecutar(imagen_g, 0)
             elif opcionMenuBordes == "9":
                 menu()
